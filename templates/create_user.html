@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Create User</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container py-5">
+    <h2>Create New User</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label>Full Name</label>
+            <input type="text" class="form-control" name="full_name" required>
+        </div>
+        <div class="mb-3">
+            <label>Username</label>
+            <input type="text" class="form-control" name="username" required>
+        </div>
+        <div class="mb-3">
+            <label>Password</label>
+            <input type="password" class="form-control" name="password" required>
+        </div>
+        <div class="mb-3">
+            <label>Role</label>
+            <select name="role" class="form-select" required>
+                <option value="contractor">Contractor</option>
+                <option value="inspector">Inspector</option>
+                <option value="lead_inspector">Lead Inspector</option>
+                <option value="contractor_supervisor">Contractor Supervisor</option>
+                <option value="employer_supervisor">Employer Supervisor</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label>Discipline</label>
+            <select name="discipline" class="form-select" required>
+                <option value="Civil">Civil</option>
+                <option value="Electrical">Electrical</option>
+                <option value="Mechanical">Mechanical</option>
+                <option value="Instrument">Instrument</option>
+                <option value="General">General</option>
+            </select>
+        </div>
+        <button class="btn btn-success">Create User</button>
+    </form>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="alert alert-{{ category }} mt-3">{{ message }}</div>
+  {% endfor %}
+{% endwith %}
+
+</div>
+</body>
+</html>

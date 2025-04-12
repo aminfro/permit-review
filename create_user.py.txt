@@ -1,0 +1,12 @@
+from app import app, db, User
+
+with app.app_context():
+    user = User(
+        username='amin',
+        full_name='Amin Amiri',
+        role='inspector'  # یا contractor
+    )
+    user.set_password('123456')  # پسورد دلخواهت
+    db.session.add(user)
+    db.session.commit()
+    print("User created successfully!")

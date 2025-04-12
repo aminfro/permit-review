@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container py-5">
+    <h2>Welcome, {{ user.full_name }}</h2>
+    <p>Your role is: <strong>{{ user.role }}</strong></p>
+
+    <!-- Admin Section -->
+    {% if user.role == 'admin' %}
+        <h4 class="mt-4">All Users</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Discipline</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                    <tr>
+                        <td>{{ u.full_name }}</td>
+                        <td>{{ u.username }}</td>
+                        <td>{{ u.role }}</td>
+                        <td>{{ u.discipline }}</td>
+                        <td>
+                            <a href="{{ url_for('reset_password', user_id=u.id) }}" class="btn btn-sm btn-outline-warning">Reset</a>
+
+                            <form action="{{ url_for('delete_user', user_id=u.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure?');">
+                                <button class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <!-- Contractor Section -->
+    {% if user.role == 'contractor' %}
+        <h4>Your Permits:</h4>
+<div class="mb-3">
+    <a href="{{ url_for('submit_permit') }}" class="btn btn-primary">+ Create New Permit</a>
+</div>
+
+        <ul class="list-group mb-4">
+            {% for permit in permits %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>#{{ permit.permit_number }}</strong> - {{ permit.title }}<br>
+                            <small>Status: <strong>{{ permit.status }}</strong></small>
+                        </div>
+                        <a href="{{ url_for('view_permit', permit_id=permit.id) }}" class="btn btn-sm btn-outline-info">View</a>
+                    </div>
+                </li>
+            {% else %}
+                <li class="list-group-item">No permits submitted yet.</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+{% if user.role == 'inspector' %}
+    <!-- NEW Permits Section -->
+    <h4>🆕 New Permits for You</h4>
+    {% if new_permits %}
+        <ul class="list-group mb-4">
+            {% for permit in new_permits %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>#{{ permit.permit_number }}</strong> - {{ permit.title }}
+                        <br><small>Status: {{ permit.status }}</small>
+                    </div>
+                    <a href="{{ url_for('review_permit', permit_id=permit.id) }}" class="btn btn-sm btn-outline-primary">Review</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-muted">No new permits to review 🎉</p>
+    {% endif %}
+
+    <!-- Reviewed Permits Section -->
+    <h4>👁 Your Reviewed Permits</h4>
+    {% if reviewed_permits %}
+        <ul class="list-group">
+            {% for permit in reviewed_permits %}
+                {% for review in permit.reviews %}
+                    {% if review.inspector_id == user.id %}
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>#{{ permit.permit_number }}</strong> - {{ permit.title }}
+                                    <br><small>Status: {{ permit.status }}</small>
+                                    <br><span class="badge bg-{{ 'success' if review.status == 'approved' else 'danger' }}">
+                                        You {{ review.status|capitalize }}
+                                    </span>
+                                </div>
+                                <a href="{{ url_for('review_permit', permit_id=permit.id) }}" class="btn btn-sm btn-outline-secondary">View/Edit</a>
+                            </div>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-muted">You haven't reviewed any permits yet.</p>
+    {% endif %}
+{% endif %}
+
+
+{% if user.role == 'admin' %}
+    <h4 class="mt-5">All Permits:</h4>
+    {% if permits %}
+        <ul class="list-group">
+            {% for permit in permits %}
+                <li class="list-group-item">
+                    <strong>#{{ permit.permit_number }}</strong> - {{ permit.title }} ({{ permit.discipline }})
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-muted">No permits in the system yet.</p>
+    {% endif %}
+{% endif %}
+
+    <!-- Admin Buttons -->
+    {% if user.role == 'admin' %}
+        <div class="d-flex gap-2 mt-3">
+            <a href="{{ url_for('create_user') }}" class="btn btn-success">+ Create New User</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
+        </div>
+    {% else %}
+        <a href="{{ url_for('logout') }}" class="btn btn-danger mt-3">Logout</a>
+    {% endif %}
+</div>
+</body>
+</html>
